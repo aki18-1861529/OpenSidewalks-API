@@ -19,6 +19,23 @@ body {
   
   }
 
+  p2 {
+    color: rgb(255, 255, 255);
+ 
+    position: absolute;
+    top: 300px;
+    left: 100px;
+    font-size: 25px;
+    font-family: 'Oswald', sans-serif;
+   
+   -webkit-animation-duration: 2s;
+    animation-duration: 2s;
+   -webkit-animation-name: bounceIn;
+    animation-name: bounceIn;
+    animation-fill-mode: backwards;
+    animation-delay: 1s;
+  }
+
   .custom-file-upload {
     border: 1px solid #ccc;
     color: rgb(255, 255, 255);
@@ -27,7 +44,7 @@ body {
     cursor: pointer;
     border-radius: 20px;
     transition-duration: 0.6s;
-    padding: 0px 35px;
+    padding: 0px 40px;
     font-size: 15px;
     font-family: 'Oswald', sans-serif;
     position: absolute;
@@ -38,13 +55,13 @@ body {
    -webkit-animation-name: bounceIn;
     animation-name: bounceIn;
     animation-fill-mode: backwards;
-    animation-delay: 1s;
+    animation-delay: 2s;
 }
 .custom-file-upload2 {
   border: 1px solid #ccc;
   color: rgb(255, 255, 255);
   background-color: rgb(255, 0, 0);
-  padding: 0px 30px;
+  padding: 0px 35px;
   cursor: pointer;
   border-radius: 20px;
   transition-duration: 0.6s;
@@ -52,14 +69,14 @@ body {
   font-size: 15px;
   font-family: 'Oswald', sans-serif;
   position: absolute;
-  top: 450px;
+  top: 400px;
   left: 1000px;
   -webkit-animation-duration: 2s;
     animation-duration: 2s;
    -webkit-animation-name: bounceIn;
     animation-name: bounceIn;
     animation-fill-mode: backwards;
-    animation-delay: 1s;
+    animation-delay:2s;
 }
   .custom-file-upload:hover{
     background-color: #4CAF50; /* Green */
