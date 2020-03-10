@@ -1,0 +1,98 @@
+body {
+    background-image: linear-gradient(rgb(151, 1, 174), rgb(255, 223, 0));
+    padding: 35%;
+  }
+
+  h1 {
+    color: rgb(255, 255, 255);
+ 
+    position: absolute;
+    top: 90px;
+    left: 100px;
+    font-size: 60px;
+    font-family: 'Oswald', sans-serif;
+   
+   -webkit-animation-duration: 2s;
+    animation-duration: 2s;
+   -webkit-animation-name: bounceIn;
+    animation-name: bounceIn;
+  
+  }
+
+  .custom-file-upload {
+    border: 1px solid #ccc;
+    color: rgb(255, 255, 255);
+    background-color: rgb(255, 0, 0);
+    
+    cursor: pointer;
+    border-radius: 20px;
+    transition-duration: 0.6s;
+    padding: 0px 35px;
+    font-size: 15px;
+    font-family: 'Oswald', sans-serif;
+    position: absolute;
+    top: 300px;
+    left: 1000px;
+    -webkit-animation-duration: 2s;
+    animation-duration: 2s;
+   -webkit-animation-name: bounceIn;
+    animation-name: bounceIn;
+    animation-fill-mode: backwards;
+    animation-delay: 1s;
+}
+.custom-file-upload2 {
+  border: 1px solid #ccc;
+  color: rgb(255, 255, 255);
+  background-color: rgb(255, 0, 0);
+  padding: 0px 30px;
+  cursor: pointer;
+  border-radius: 20px;
+  transition-duration: 0.6s;
+
+  font-size: 15px;
+  font-family: 'Oswald', sans-serif;
+  position: absolute;
+  top: 450px;
+  left: 1000px;
+  -webkit-animation-duration: 2s;
+    animation-duration: 2s;
+   -webkit-animation-name: bounceIn;
+    animation-name: bounceIn;
+    animation-fill-mode: backwards;
+    animation-delay: 1s;
+}
+  .custom-file-upload:hover{
+    background-color: #4CAF50; /* Green */
+    
+  }
+
+  .custom-file-upload2:hover{
+    background-color: #4CAF50; /* Green */
+
+  }
+
+
+ input[type="file"] {
+  display:none;
+} 
+
+  @keyframes bounceIn {
+    0% {
+      transform: translate(0%, 100%);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes goUp{
+    0%{
+      transform: translate(0%, 0%);
+    }
+    50%{
+      transform: translate(0%, 10%);
+    }
+    100%{
+      transform: translate(0%, 0%);
+    }
+  }
