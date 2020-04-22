@@ -21,7 +21,7 @@ def connect_curbs_crossings(curbs, crossings, simplify=0.05):
     crossings.sindex
     offset = 100
     bbox = curbs.bounds + [-offset, -offset, offset, offset]
-    hits = bbox.apply(lambda row: crossings(crossings.sindex.intersection(row)), axis=1)
+    hits = bbox.apply(lambda row: list(crossings.sindex.intersection(row)), axis=1)
 
     tmp = pd.DataFrame({"pt_idx": np.repeat(hits.index, hits.apply(len)), "line_i": np.concatenate(hits.values)})
     tmp = tmp.join(crossings.reset_index(drop=True), on="line_i")
@@ -36,7 +36,7 @@ def connect_curbs_crossings(curbs, crossings, simplify=0.05):
 
     pos = closest.geometry.project(gpd.GeoSeries(closest.point))
     new_pts = closest.geometry.interpolate(pos)
-    line_columns = ['GlobalID']
+    line_columns = ['geometry']
     snapped = gpd.GeoDataFrame(closest[line_columns],geometry=new_pts)
     updated_points = curbs.drop(columns=["geometry"]).join(snapped)
     updated_points = updated_points.dropna(subset=["geometry"])
