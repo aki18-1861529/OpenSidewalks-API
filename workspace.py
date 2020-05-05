@@ -28,20 +28,27 @@ def create_graph(gdf, precision=1, simplify=0.05):
     # geometry), az2 is for the last segment (pointing out of the geometry)
     def add_edges(row, G, precision=precision):
         # setup your projections
-        crs_wgs = proj.Proj(init='epsg:4326') # WGS84 geographic
-        crs_bng = proj.Proj(init='epsg:102005')
+        # crs_wgs = proj.Proj(init='epsg:4326') # WGS84 geographic
+        # crs_bng = proj.Proj(init='epsg:102005')
 
         
         geom = row.geometry
-        coords = list(geom.coords)
+                
+
+        if geom.geom_type == "MultiLineString":
+            multicoords = [list(line.coords) for line in geom]
+            # Making a flat list -> LineString
+            simple = geometry.LineString([item for sublist in multicoords for item in sublist])
+            coords = list(simple.coords)
+        elif geom.geom_type == "LineString":
+            coords = geom.coords
 
         # cast coordinates to projected system
-        for c in coords:
-            c = proj.transform(crs_wgs, crs_bng, c[0], c[1])
+        # for c in coords:
+            # c = proj.transform(crs_wgs, crs_bng, c[0], c[1])
 
         geom = geometry.LineString(coords[::])
         geom_r = geometry.LineString(coords[::-1])
-        # coords_r = geom_r.coords
         start = make_node(coords[0], precision) # first element
         end = make_node(coords[-1], precision) # last element
 
@@ -52,7 +59,6 @@ def create_graph(gdf, precision=1, simplify=0.05):
             # 'az1': azimuth(coords[0], coords[1]),
             # 'az2': azimuth(coords[-2], coords[-1]),
             'visited': 0,
-            'id': row.id
         }
         G.add_edge(start, end, **fwd_attr)
 
@@ -63,7 +69,6 @@ def create_graph(gdf, precision=1, simplify=0.05):
             # 'az1': azimuth(coords_r[0], coords_r[1]),
             #'az2': azimuth(coords_r[-2], coords_r[-1]),
             'visited': 0,
-            'id': row.id
         }
         G.add_edge(end, start, **rev_attr)
 
@@ -92,12 +97,14 @@ def graph_workflow(gdf, precision=1):
     grouped = gdf.groupby("full_stree")
     # undirected subgraphs for each street name
     subgraphs = []
-    for street in grouped:
-        results = gdf.loc[[street]]
-        G = create_graph(results)
-        subgraphs.append(G)
-    return subgraphs
 
+    def create_subgraph(group):
+        G = create_graph(group)
+        subgraphs.append(G)
+
+    grouped.apply(create_subgraph)
+
+    return subgraphs
 
 
 
@@ -108,7 +115,7 @@ def merge_edges(G):
     newG = nx.DiGraph()
     # make a list of starting nodes 
     for n in G.nodes(G):
-        if G.degree(G, nbunch=n) == 2: # in-degree plus out-degree
+        if G.degree(nbunch=n) == 2: # in-degree plus out-degree
             starting_nodes.append(n)
     # iterate through starting nodes to connect sidewalks
     for node in starting_nodes:
@@ -136,12 +143,12 @@ def merge_edges(G):
 
 
 def main():
-    sdw_exists.set_index("full_stree")
-    sdw_exists.sort_index()
     sgraphs = graph_workflow(sdw_exists)
-     # for sg in sgraphs:
-       # graphed = create_graph(sg)
-       # merged = merge_edges(graphed)
+    for sg in sgraphs:
+       sg = merge_edges(sg)
+    # combined = nx.disjoint_union_all(sgraphs)
+    # new_gdf = nx.to_pandas_adjacency(combined)
+    # new_gdf.to_file("sdw_connect_test.shp")
     print("complete!")
 
 
