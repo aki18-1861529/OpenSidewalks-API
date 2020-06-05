@@ -5,13 +5,15 @@ import networkx as nx
 import pyproj as proj
 import numexpr as num 
 import pickle
-from bellevueWorkspace import create_graph_bell
 
 
 bbox = (-97.74655,30.28317,-97.73650,30.26129)
 # Austin Data: ('Sidewalks/geo_export_8f5a3f72-4a94-4006-84e5-650856822b59.shp')
 # Bellevue Data: 'Bellevue_data/PedestrianFacilities_COBApr2020.shp'
 sdw = gp.read_file('Bellevue_data/PedestrianFacilities_COBApr2020.shp')
+
+# fill blank values
+sdw['Material'] = sdw['Material'].fillna("Null")
 
 if "pedestrian" in sdw.keys():
     sdw_exists = sdw[sdw["pedestrian"] != 'ABSENT_SIDEWALKS']
@@ -33,6 +35,7 @@ def create_graph(gdf, precision=1, simplify=0.05):
 
     # The geometries sometimes have tiny end parts - get rid of those!
     gdf.geometry = gdf.geometry.simplify(simplify)
+
     
 
     # Set street name 
@@ -48,28 +51,8 @@ def create_graph(gdf, precision=1, simplify=0.05):
     def make_node(coord, precision):
         return tuple(np.round(coord, precision))
      
-    
- 
-    # Edges are stored as (from, to, data), where from and to are nodes.
-    def add_edges(row, G, precision=precision):
-        
-        geom = row.geometry
-        
-        if geom.geom_type == "MultiLineString" and street_name_exists:
-            multicoords = [list(line.coords) for line in geom] #gets coordinates of all linestrings
-            # Making a flat list -> LineString
-            simple = geometry.LineString([item for sublist in multicoords for item in sublist])
-            coords = list(simple.coords)
-        elif geom.geom_type == "MultiLineString" and not street_name_exists:
-            for line in geom: #gets coordinates of all linestrings
-                coords = list(line.coords)
-        elif geom.geom_type == "LineString":
-            coords = geom.coords
-            # print("coords ", geom)
-
-        
-
-
+    # helper function to create edges
+    def add_edges_sub(G, precision, coords, street_name, material):
         geom = geometry.LineString(coords[::])
         geom_r = geometry.LineString(coords[::-1])
         start = make_node(coords[0], precision) # first element
@@ -88,7 +71,7 @@ def create_graph(gdf, precision=1, simplify=0.05):
             'forward': 1,
             'geometry': geom,
             'street': street_name,
-            'visited': 0,
+            'surface': material,
         }
         G.add_edge(start, end, **fwd_attr)
 
@@ -97,25 +80,42 @@ def create_graph(gdf, precision=1, simplify=0.05):
             'forward': 0,
             'geometry': geom_r,
             'street': street_name,
-            'visited': 0,
+            'surface': material,
         }
         G.add_edge(end, start, **rev_attr)
 
+ 
+    # Edges are stored as (from, to, data), where from and to are nodes.
+    def add_edges(row, G, precision=precision):
+        
+        geom = row.geometry
+        material = row['Material']
+
+        # adjust material values to OSM standard
+        if material == "Boardwalk":
+            material = "wood"
+        elif material == "Brick":
+            material = "paving_stones"
+
+        
+        if geom.geom_type == "MultiLineString" and street_name_exists:
+            multicoords = [list(line.coords) for line in geom] #gets coordinates of all linestrings
+            # Making a flat list -> LineString
+            simple = geometry.LineString([item for sublist in multicoords for item in sublist])
+            coords = list(simple.coords)
+        elif geom.geom_type == "MultiLineString" and not street_name_exists:
+            for line in geom: #gets coordinates of all linestrings
+                coords = list(line.coords)
+                add_edges_sub(G, precision, coords, street_name, material)
+        elif geom.geom_type == "LineString":
+            coords = geom.coords
+            add_edges_sub(G, precision, coords, street_name, material)
+            
 
 
     gdf.apply(add_edges, axis=1, args=[G])
 
     return G
-
-    # undirected graph for each of them. 
-    # connected subgraphs: 
-    # know which node to start on - degree of 1
-    # exceptions: degree > 2 incorrect
-    # pass through coordinates and connect them
-
-    #directional vs non directional graphs
-
-
 
 
 
@@ -145,9 +145,9 @@ def main():
         sgraphs = graph_workflow(sdw_exists)
     else:
         sgraphs = []
-        sgraphs.append(create_graph_bell(sdw_exists, street_name_exists))
+        sgraphs.append(create_graph(sdw_exists, street_name_exists))
     
-    with open('bellevue0602.pickle', 'wb') as f:
+    with open('bellevue0603.pickle', 'wb') as f:
     # Pickle the 'data' dictionary using the highest protocol available.
         pickle.dump(sgraphs, f, pickle.HIGHEST_PROTOCOL)
 
