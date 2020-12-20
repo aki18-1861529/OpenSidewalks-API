@@ -1,6 +1,6 @@
 # OpenSidewalks-API
 ## Usage
-## Put the shp files to the same directory as the process.sh
+### Put the shp files to the same directory as the process.sh
 
 ./process.sh [shp file location]
 
