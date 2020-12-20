@@ -1,2 +1,4 @@
 # OpenSidewalks-API
-## hello testing 
+## Usage
+
+./process.sh [shp file location]
