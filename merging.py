@@ -8,6 +8,10 @@ import json
 import pickle
 from workspace import street_name_exists
 
+# saved output of code in a compressed form
+# run workspace once then run pickle file through merging.py to get json output
+
+
 #bellevue data pickle: bellevue0526
 #aus data pickle: sgraphs_aus_bounded.pickle
 with open('bellevue0603.pickle', 'rb') as f:
@@ -95,7 +99,7 @@ def main():
         # get forward, street, and visited information
         fwd = e[2].get("forward")
         street = e[2].get("street")
-        surface = e[2].get("surface")
+        surface = (e[2].get("surface")).lower() 
 
         #add next point
         if not isinstance(ddict, list):
@@ -133,7 +137,7 @@ def main():
         edge_geom.append(ptFinal1)
         edge_geom.append(ptFinal2)
 
-        info = {"highway": "footway", "subclass": "footway", "forward": fwd, "street": street, "surface": surface}
+        info = {"highway": "footway", "surface": surface}
         gmt = {"type": "LineString", "coordinates": edge_geom}
 
         feat = {"type": "Feature", "geometry": gmt, "properties": info}
