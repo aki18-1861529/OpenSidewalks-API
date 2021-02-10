@@ -5,13 +5,15 @@ import networkx as nx
 import pyproj as proj
 import numexpr as num 
 import pickle
+import sys
 
-# creates the graph
 
 bbox = (-97.74655,30.28317,-97.73650,30.26129)
-# Austin Data: ('Sidewalks/geo_export_96c94f6f-dee6-460f-9a95-7b03483b39d6.shp')
-# Bellevue Data: 'Bellevue_data/PedestrianFacilities_COBApr2020.shp'
-sdw = gp.read_file('Bellevue_data/PedestrianFacilities_COBApr2020.shp')
+# Austin Data: ('Sidewalks/geo_export_8f5a3f72-4a94-4006-84e5-650856822b59.shp')
+# Bellevue Data: '/home/kellie/Desktop/pythonworkspace/OpenSidewalks-API/PedestrianFacilities_COBApr2020.shp'
+# sdw = gp.read_file('/home/kellie/Desktop/pythonworkspace/OpenSidewalks-API/PedestrianFacilities_COBApr2020.shp')
+
+sdw = gp.read_file(sys.argv[1])
 
 # fill blank values
 sdw['Material'] = sdw['Material'].fillna("Null")
