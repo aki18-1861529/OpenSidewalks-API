@@ -34,7 +34,7 @@ def merge_edges(G):
         geom_all = []
         first_neigh = next(G.successors(node))
         edge_data_1 = G.get_edge_data(node, first_neigh)
-        # print(edge_data_1)
+        print(edge_data_1)
         init_geom = edge_data_1['geometry']
         fwd = edge_data_1['forward']
         street = edge_data_1['street']
@@ -42,14 +42,16 @@ def merge_edges(G):
         print("starting node ", node)
         print("first neigh ", first_neigh)
         prev_neigh = node
-        while G.degree(nbunch=first_neigh) != 2: #in-degree plus out-degree. caught in loop here?
+        while (G.has_node(first_neigh)) and (G.degree(nbunch=first_neigh) != 2): #in-degree plus out-degree. caught in loop here?
+            print("start while loop")
             second_neigh = G.successors(first_neigh)  # Returns an iterator over successor nodes of n.
             for neigh in second_neigh:
                 if neigh != prev_neigh and neigh != first_neigh: # select node going in correct direction
                     second_neigh = neigh 
             edge_data_2 = G.get_edge_data(first_neigh, second_neigh)
-            next_geom = edge_data_2['geometry']
-            geom_all.append(next_geom)
+            if (edge_data_2 is not None):
+                next_geom = edge_data_2['geometry']
+                geom_all.append(next_geom)
             prev_neigh = first_neigh
             first_neigh = second_neigh
         dict_info = {
@@ -66,8 +68,9 @@ def main():
     # print(len(sgraphs))
     combined = nx.DiGraph() # giant graph - combination of all subgraphs
     for sg in sgraphs_data:
-        if street_name_exists:
-            sg = merge_edges(sg)
+        # if street_name_exists:
+            # sg = merge_edges(sg)
+        sg = merge_edges(sg)    # may need to comment out
         sg_edges = sg.edges(data=True)
         combined.add_edges_from(sg_edges)
 

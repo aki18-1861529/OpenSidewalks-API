@@ -9,9 +9,6 @@ import sys
 
 
 bbox = (-97.74655,30.28317,-97.73650,30.26129)
-# Austin Data: ('Sidewalks/geo_export_8f5a3f72-4a94-4006-84e5-650856822b59.shp')
-# Bellevue Data: '/home/kellie/Desktop/pythonworkspace/OpenSidewalks-API/PedestrianFacilities_COBApr2020.shp'
-# sdw = gp.read_file('/home/kellie/Desktop/pythonworkspace/OpenSidewalks-API/PedestrianFacilities_COBApr2020.shp')
 
 sdw = gp.read_file(sys.argv[1])
 
@@ -148,7 +145,7 @@ def main():
         sgraphs = graph_workflow(sdw_exists)
     else:
         sgraphs = []
-        sgraphs.append(create_graph(sdw_exists, street_name_exists))
+        sgraphs.append(create_graph(sdw_exists))
     
     with open('bellevue0603.pickle', 'wb') as f:
     # Pickle the 'data' dictionary using the highest protocol available.
@@ -161,8 +158,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-        
