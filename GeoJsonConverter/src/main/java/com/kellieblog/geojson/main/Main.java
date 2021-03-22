@@ -42,16 +42,24 @@ public class Main {
         BufferedReader bufferedReader = new BufferedReader(new FileReader(new File("edges.geojson")));
         String line;
         while (!(line = bufferedReader.readLine()).equals("]")) {
-            bufferedWriter.write(line+"\n");
+            bufferedWriter.write(line + "\n");
         }
         bufferedReader.close();
         bufferedWriter.write(",\n");
+        int mapSize = pointsToConnectMap.size();
+        int counter = 1;
         for (Integer nodeId : pointsToConnectMap.keySet()) {
             bufferedWriter.write("{ \"type\": \"Feature\", \"properties\": { \"forward\": 0, \"street\": \"null\", " +
                     "\"surface\": \"null\", \"node_start\": " + nodeId + ", \"node_end\": " + pointsToConnectMap.get(nodeId) + " }," +
                     " \"geometry\": { \"type\": \"LineString\", \"coordinates\": [ [ " + nodeSet.get(nodeId).x + ", " + nodeSet.get(nodeId).y + "]" +
-                    ",[" + nodeSet.get(pointsToConnectMap.get(nodeId)).x + ", " + nodeSet.get(pointsToConnectMap.get(nodeId)).y + "] ] } },\n");
+                    ",[" + nodeSet.get(pointsToConnectMap.get(nodeId)).x + ", " + nodeSet.get(pointsToConnectMap.get(nodeId)).y + "] ] } }");
+            if (counter++ < mapSize) {
+                bufferedWriter.write(",\n");
+            } else {
+                bufferedWriter.write("\n");
+            }
         }
+
         bufferedWriter.write("]}\n");
         bufferedWriter.close();
     }
